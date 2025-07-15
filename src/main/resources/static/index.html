@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Weather | Java Spring Boot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px 40px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #ffffff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div id="loading" class="loader"></div>
+    <h1>Live Weather</h1>
+    <p id="weather">Fetching weather info...</p>
+    <div class="footer">Powered by OpenWeather API</div>
+</div>
+
+<script>
+    window.onload = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById("loading").style.display = 'none';
+                        document.getElementById("weather").textContent = data;
+                    })
+                    .catch(error => {
+                        document.getElementById("loading").style.display = 'none';
+                        document.getElementById("weather").textContent = "Error fetching weather.";
+                        console.error(error);
+                    });
+            }, () => {
+                document.getElementById("loading").style.display = 'none';
+                document.getElementById("weather").textContent = "Location permission denied.";
+            });
+        } else {
+            document.getElementById("loading").style.display = 'none';
+            document.getElementById("weather").textContent = "Geolocation not supported.";
+        }
+    }
+</script>
+</body>
+</html>
